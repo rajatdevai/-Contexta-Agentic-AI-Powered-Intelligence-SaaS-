@@ -11,12 +11,12 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: function() {
+    required: function () {
       return !this.googleId; // Password required only if not Google auth
     },
     minlength: 6
   },
-  
+
   // Google OAuth
   googleId: {
     type: String,
@@ -27,52 +27,27 @@ const userSchema = new mongoose.Schema({
     name: String,
     picture: String
   },
-  
+
   // User preferences (filled in onboarding)
-  interests: [{
-    type: String,
-    enum: [
-      'technology',
-      'politics',
-      'finance',
-      'ai',
-      'cloud',
-      'cybersecurity',
-      'web3',
-      'devops',
-      'sports',
-      'startups',
-      'science',
-      'business',
-      'geopolitics'
-    ],
-    validate: {
-      validator: function(arr) {
-        return arr.length <= 4; // Max 4 topics
-      },
-      message: 'Maximum 4 topics allowed'
-    }
-  }],
-  
+  interests: {
+    type: [String],
+    default: []
+  },
+
   keywords: [String],
-  
+
   delivery: {
     type: {
       type: String,
       enum: ['email'],
       default: 'email'
     },
-    times: [{
-      type: String,
-      validate: {
-        validator: function(arr) {
-          return arr.length <= 2; // Max 2 times per day
-        },
-        message: 'Maximum 2 delivery times allowed'
-      }
-    }]
+    times: {
+      type: [String],
+      default: []
+    }
   },
-  
+
   preferences: {
     tone: {
       type: String,
@@ -84,52 +59,60 @@ const userSchema = new mongoose.Schema({
       default: 5
     }
   },
-  
+
   // Profile completion
   isOnboarded: {
     type: Boolean,
     default: false
   },
-  
+
   isActive: {
     type: Boolean,
     default: true
   },
-  
+
   isVerified: {
     type: Boolean,
     default: false
   },
-  
+
   verificationToken: String,
-  
+
   // Password reset
   resetPasswordToken: String,
-  resetPasswordExpires: Date
+  resetPasswordExpires: Date,
+
+  // Usage Limits
+  emailsSent: {
+    type: Number,
+    default: 0
+  }
 }, {
   timestamps: true
 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    next();
   } catch (error) {
-    next(error);
+    throw error;
   }
 });
 
 // Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  if (!candidatePassword || !this.password) {
+    return false;
+  }
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
 // Get safe user object (no password)
-userSchema.methods.toSafeObject = function() {
+userSchema.methods.toSafeObject = function () {
   return {
     id: this._id,
     email: this.email,
@@ -142,5 +125,14 @@ userSchema.methods.toSafeObject = function() {
     createdAt: this.createdAt
   };
 };
+
+// Array length validators
+userSchema.path('interests').validate(function (arr) {
+  return arr.length <= 4;
+}, 'Maximum 4 topics allowed');
+
+userSchema.path('delivery.times').validate(function (arr) {
+  return arr.length <= 2;
+}, 'Maximum 2 delivery times allowed');
 
 export default mongoose.model('User', userSchema);

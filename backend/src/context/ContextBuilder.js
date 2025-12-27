@@ -6,7 +6,7 @@ import Thread from '../models/Thread.js';
 class ContextBuilder {
   async buildUserContext(userId) {
     const user = await User.findById(userId);
-    
+
     if (!user) {
       throw new Error('User not found');
     }
@@ -16,9 +16,9 @@ class ContextBuilder {
       userId: user._id,
       rating: { $exists: true }
     })
-    .sort({ ratedAt: -1 })
-    .limit(50)
-    .populate('eventId');
+      .sort({ ratedAt: -1 })
+      .limit(50)
+      .populate('eventId');
 
     // Calculate preferences from feedback
     const feedbackStats = this.analyzeFeedback(recentFeedback);
@@ -36,7 +36,7 @@ class ContextBuilder {
 
   async buildEventContext(eventId) {
     const event = await Event.findById(eventId);
-    
+
     if (!event) {
       throw new Error('Event not found');
     }
@@ -139,7 +139,7 @@ class ContextBuilder {
 
   buildSystemContext() {
     return {
-      systemName: 'DevSignal AI',
+      systemName: 'Contexta AI',
       version: '1.0.0',
       capabilities: [
         'multi-source-collection',
@@ -160,7 +160,7 @@ class ContextBuilder {
   async buildFullContext(userId, eventId = null) {
     const system = this.buildSystemContext();
     const user = await this.buildUserContext(userId);
-    
+
     let event = null;
     let session = null;
 

@@ -78,24 +78,119 @@ router.get('/', async (req, res) => {
     }[rating];
 
     res.send(`
+      <!DOCTYPE html>
       <html>
         <head>
+          <title>Feedback Received - Contexta AI</title>
           <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; text-align: center; padding: 50px; background: #f5f5f5; }
-            .container { max-width: 500px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            h1 { color: #0066cc; }
-            .emoji { font-size: 64px; margin: 20px 0; }
-            p { color: #666; line-height: 1.6; }
-            .btn { display: inline-block; margin-top: 20px; padding: 12px 30px; background: #0066cc; color: white; text-decoration: none; border-radius: 6px; }
+            body { 
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+              margin: 0; 
+              padding: 0; 
+              background: #020617; 
+              color: white;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              min-height: 100vh;
+              overflow: hidden;
+            }
+            .background {
+              position: fixed;
+              top: 0; left: 0; width: 100%; height: 100%;
+              background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #020617 100%);
+              z-index: -1;
+            }
+            .stars {
+              position: fixed;
+              width: 1px; height: 1px;
+              background: white;
+              box-shadow: ${Array(50).fill(0).map(() => `${Math.random() * 100}vw ${Math.random() * 100}vh white`).join(', ')};
+              z-index: -1;
+            }
+            .container { 
+              background: rgba(255, 255, 255, 0.03);
+              backdrop-filter: blur(20px);
+              -webkit-backdrop-filter: blur(20px);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              padding: 60px 40px; 
+              border-radius: 32px; 
+              box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+              text-align: center;
+              max-width: 450px;
+              width: 90%;
+              animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            @keyframes slideUp {
+              from { opacity: 0; transform: translateY(40px) scale(0.95); }
+              to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+            .emoji-orb {
+              width: 120px;
+              height: 120px;
+              background: rgba(255, 255, 255, 0.05);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 64px;
+              margin: 0 auto 30px;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+            }
+            h1 { 
+              font-size: 32px;
+              font-weight: 800;
+              margin: 0 0 16px; 
+              background: linear-gradient(to right, #60a5fa, #a855f7);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+            }
+            p { 
+              color: #94a3b8; 
+              line-height: 1.6; 
+              font-size: 18px;
+              margin-bottom: 32px;
+            }
+            .rating-tag {
+              display: inline-block;
+              padding: 6px 16px;
+              background: rgba(96, 165, 250, 0.1);
+              color: #60a5fa;
+              border-radius: 100px;
+              font-weight: 700;
+              font-size: 14px;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin-bottom: 40px;
+            }
+            .btn { 
+              display: block;
+              padding: 16px 32px; 
+              background: #3b82f6; 
+              color: white; 
+              text-decoration: none; 
+              border-radius: 16px; 
+              font-weight: 700;
+              transition: all 0.3s ease;
+              box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+            }
+            .btn:hover {
+              transform: translateY(-2px);
+              background: #2563eb;
+              box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.4);
+            }
           </style>
         </head>
         <body>
+          <div class="background"></div>
+          <div class="stars"></div>
           <div class="container">
-            <div class="emoji">${rating === 5 ? '🎉' : rating === 3 ? '👍' : '📝'}</div>
-            <h1>Thank You!</h1>
-            <p>Your feedback has been recorded: <strong>${ratingText}</strong></p>
-            <p>This helps us improve your personalized intelligence feed.</p>
-            <a href="${process.env.FRONTEND_URL}/dashboard?user=${userId}" class="btn">Go to Dashboard</a>
+            <div class="emoji-orb">${rating === '5' ? '🚀' : rating === '3' ? '⭐' : '📝'}</div>
+            <h1>Feedback Received</h1>
+            <p>Your response helps us fine-tune your personal intelligence agent.</p>
+            <div class="rating-tag">Recorded: ${ratingText}</div>
+            <a href="${process.env.FRONTEND_URL}/dashboard?user=${userId}" class="btn">Return to Dashboard</a>
           </div>
         </body>
       </html>

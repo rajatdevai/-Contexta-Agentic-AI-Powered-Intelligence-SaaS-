@@ -3,6 +3,9 @@ import Event from '../models/Events.js';
 import UserEvent from '../models/UserEvent.js';
 import User from '../models/User.js';
 import UserProcessingState from '../models/UserProcessingState.js';
+import { collectAllSources } from '../collectors/index.js';
+import { processUnprocessedEvents } from '../scheduler/eventProcessor.js';
+import emailService from '../services/emailService.js';
 
 const router = express.Router();
 
@@ -85,7 +88,7 @@ router.get('/user/:userId/events', async (req, res) => {
 router.get('/unprocessed', async (req, res) => {
   try {
     const events = await Event.find({ aiProcessed: false }).limit(10);
-    
+
     res.json({
       success: true,
       count: events.length,
@@ -109,7 +112,7 @@ router.post('/clear-events', async (req, res) => {
   try {
     const eventCount = await Event.deleteMany({});
     const userEventCount = await UserEvent.deleteMany({});
-    
+
     res.json({
       success: true,
       message: 'Database cleared',
@@ -140,7 +143,7 @@ router.get('/user/:userId/processing-state', async (req, res) => {
     }
 
     let userState = await UserProcessingState.findOne({ userId });
-    
+
     if (!userState) {
       return res.json({
         success: true,
@@ -192,7 +195,7 @@ router.get('/user/:userId/action-history', async (req, res) => {
     }
 
     const userState = await UserProcessingState.findOne({ userId });
-    
+
     if (!userState) {
       return res.json({
         success: true,
@@ -229,7 +232,7 @@ router.get('/user/:userId/errors', async (req, res) => {
     }
 
     const userState = await UserProcessingState.findOne({ userId });
-    
+
     if (!userState) {
       return res.json({
         success: true,
@@ -257,7 +260,7 @@ router.get('/user/:userId/errors', async (req, res) => {
 router.get('/all-users-stats', async (req, res) => {
   try {
     const allStates = await UserProcessingState.find({});
-    
+
     const stats = allStates.map(state => ({
       userId: state.userId,
       email: state.email,
@@ -280,5 +283,32 @@ router.get('/all-users-stats', async (req, res) => {
   }
 });
 
-export default router;
+// Force collection and processing
+router.post('/force-sync', async (req, res) => {
+  try {
+    console.log('\n🔄 Manual force-sync triggered via API');
+    await collectAllSources();
+    await processUnprocessedEvents();
+    res.json({ success: true, message: 'Collection and processing triggered' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
+// Send digest for current user now
+router.post('/send-my-digest', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ success: false, message: 'Email required' });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const result = await emailService.sendDigest(user);
+    res.json({ success: true, result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+export default router;

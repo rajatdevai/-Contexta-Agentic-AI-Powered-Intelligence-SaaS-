@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.4.2",
     "@tanstack/react-query": "^5.90.12",
     "axios": "^1.13.2",
+    "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.562.0",
@@ -20,11 +23,14 @@
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.69.0",
     "react-router-dom": "^7.11.0",
+    "tailwind-merge": "^2.5.4",
+    "three": "^0.182.0",
     "zod": "^4.2.1",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",

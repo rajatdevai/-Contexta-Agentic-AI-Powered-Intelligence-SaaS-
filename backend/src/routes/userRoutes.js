@@ -72,7 +72,7 @@ router.post('/register', async (req, res) => {
 router.get('/:userId', async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -173,6 +173,38 @@ router.post('/:userId/unsubscribe', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Unsubscribe failed',
+      error: error.message
+    });
+  }
+});
+
+// Delete account
+router.delete('/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // 1. Delete user events
+    await UserEvent.deleteMany({ userId });
+
+    // 2. Delete user
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Account successfully deleted'
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete account',
       error: error.message
     });
   }

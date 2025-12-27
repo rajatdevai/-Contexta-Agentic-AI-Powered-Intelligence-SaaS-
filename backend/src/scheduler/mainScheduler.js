@@ -6,8 +6,22 @@ import { startDigestScheduler } from './digestScheduler.js';
 export function startSchedulers() {
   console.log('\n🚀 Starting all schedulers...\n');
 
-  // 1. Collect data every 2 hours
-  cron.schedule('0 */2 * * *', async () => {
+  // Helper to run once immediately
+  const runImmediate = async () => {
+    console.log('⚡ Initializing system data...');
+    try {
+      await collectAllSources();
+      await processUnprocessedEvents();
+      console.log('✅ Initial data collection and processing complete');
+    } catch (error) {
+      console.error('❌ Initialization error:', error);
+    }
+  };
+
+  runImmediate();
+
+  // 1. Collect data every hour at 50 mins past (to be ready for top-of-hour delivery)
+  cron.schedule('50 * * * *', async () => {
     console.log('\n📡 Scheduled data collection triggered');
     try {
       await collectAllSources();
@@ -16,8 +30,8 @@ export function startSchedulers() {
     }
   });
 
-  // 2. Process events every 30 minutes
-  cron.schedule('*/30 * * * *', async () => {
+  // 2. Process events every hour at 55 mins past
+  cron.schedule('55 * * * *', async () => {
     console.log('\n🤖 Scheduled event processing triggered');
     try {
       await processUnprocessedEvents();

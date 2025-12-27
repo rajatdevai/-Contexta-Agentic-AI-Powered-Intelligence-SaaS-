@@ -23,7 +23,6 @@ export function useAuth() {
     mutationFn: authAPI.login,
     onSuccess: (response) => {
       const { token, user } = response.data;
-      localStorage.setItem('token', token);
       setAuth(user, token);
       
       if (!user.isOnboarded) {
@@ -38,7 +37,6 @@ export function useAuth() {
     mutationFn: authAPI.register,
     onSuccess: (response) => {
       const { token, user } = response.data;
-      localStorage.setItem('token', token);
       setAuth(user, token);
       navigate('/onboarding');
     },
@@ -58,5 +56,7 @@ export function useAuth() {
     logout,
     loginError: loginMutation.error,
     registerError: registerMutation.error,
+    isLoginLoading: loginMutation.isPending,
+    isRegisterLoading: registerMutation.isPending,
   };
 }

@@ -49,6 +49,8 @@ export const eventsAPI = {
   getUserEvents: (userId, params) => client.get(`/events/user/${userId}`, { params }),
   getEvent: (eventId) => client.get(`/events/${eventId}`),
   getStats: (userId) => client.get(`/events/user/${userId}/stats`),
+  trackEventView: (userId, eventId) => client.patch(`/events/user/${userId}/event/${eventId}/view`),
+  deleteAccount: (userId) => client.delete(`/users/${userId}`),
 };
 
 // Feedback API

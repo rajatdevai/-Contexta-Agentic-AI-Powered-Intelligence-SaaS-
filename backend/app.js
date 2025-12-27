@@ -1,6 +1,4 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
+import './src/config/env.js';
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
@@ -8,6 +6,12 @@ import session from 'express-session';
 import { connectDatabase } from './src/config/database.js';
 import { startSchedulers } from './src/scheduler/mainScheduler.js';
 import passport from './src/config/passport.js';
+
+console.log('\n--- Environment Loading Check ---');
+console.log('  CWD:', process.cwd());
+console.log('  GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? '✅ DEFINED (' + process.env.GOOGLE_CLIENT_ID.substring(0, 10) + '...)' : '❌ UNDEFINED');
+console.log('  GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? '✅ DEFINED' : '❌ UNDEFINED');
+console.log('--------------------------------\n');
 
 // Routes
 import authRoutes from './src/routes/authRoutes.js';
@@ -24,7 +28,23 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      process.env.FRONTEND_URL || 'http://localhost:5173',
+      'http://localhost:5173',
+      'http://localhost:5174'
+    ];
+
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('Blocked by CORS:', origin); // Debug log
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
@@ -71,7 +91,7 @@ app.get('/health', (req, res) => {
 // Root route
 app.get('/', (req, res) => {
   res.json({
-    name: 'DevSignal AI API',
+    name: 'Contexta AI API',
     version: '1.0.0',
     status: 'running'
   });
@@ -99,19 +119,19 @@ app.use((err, req, res, next) => {
 async function startServer() {
   try {
     await connectDatabase();
-    
+
     if (process.env.ENABLE_SCHEDULERS === 'true') {
       startSchedulers();
     } else {
       console.log('⏸️  Schedulers disabled');
     }
-    
+
     app.listen(PORT, () => {
-      console.log(`\n🚀 DevSignal AI Backend running on port ${PORT}`);
+      console.log(`\n🚀 Contexta AI Backend running on port ${PORT}`);
       console.log(`📍 API URL: http://localhost:${PORT}`);
       console.log(`🏥 Health check: http://localhost:${PORT}/health\n`);
     });
-    
+
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);

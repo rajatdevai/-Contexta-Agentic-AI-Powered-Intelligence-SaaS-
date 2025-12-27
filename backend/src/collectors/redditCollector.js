@@ -4,7 +4,7 @@ class RedditCollector {
   constructor() {
     this.clientId = process.env.REDDIT_CLIENT_ID;
     this.clientSecret = process.env.REDDIT_CLIENT_SECRET;
-    this.userAgent = process.env.REDDIT_USER_AGENT || 'DevSignalBot/1.0';
+    this.userAgent = process.env.REDDIT_USER_AGENT || 'ContextaBot/1.0';
     this.accessToken = null;
     this.tokenExpiry = null;
   }
@@ -16,7 +16,7 @@ class RedditCollector {
 
     try {
       const auth = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
-      
+
       const response = await axios.post(
         'https://www.reddit.com/api/v1/access_token',
         'grant_type=client_credentials',
@@ -31,7 +31,7 @@ class RedditCollector {
 
       this.accessToken = response.data.access_token;
       this.tokenExpiry = Date.now() + (response.data.expires_in * 1000);
-      
+
       console.log('[Reddit] Authenticated successfully');
       return this.accessToken;
     } catch (error) {
@@ -93,13 +93,13 @@ class RedditCollector {
 
     // AI
     if (['machinelearning', 'artificialintelligence', 'localllama', 'singularity'].includes(subreddit) ||
-        text.includes('ai') || text.includes('machine learning')) {
+      text.includes('ai') || text.includes('machine learning')) {
       topics.push('ai');
     }
 
     // Cloud
     if (['aws', 'azure', 'googlecloud', 'cloudcomputing'].includes(subreddit) ||
-        text.includes('cloud') || text.includes('kubernetes')) {
+      text.includes('cloud') || text.includes('kubernetes')) {
       topics.push('cloud');
     }
 
@@ -153,7 +153,7 @@ class RedditCollector {
       console.log(`[Reddit] Fetching r/${subreddit}...`);
       const posts = await this.fetchSubreddit(subreddit, 10);
       allPosts.push(...posts);
-      
+
       // Rate limiting - be nice to Reddit
       await new Promise(resolve => setTimeout(resolve, 2000));
     }

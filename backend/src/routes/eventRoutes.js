@@ -19,15 +19,15 @@ router.get('/user/:userId', async (req, res) => {
 
     // Filter by category/topic if provided
     let filteredEvents = userEvents;
-    
+
     if (category) {
-      filteredEvents = filteredEvents.filter(ue => 
+      filteredEvents = filteredEvents.filter(ue =>
         ue.eventId.category === category
       );
     }
 
     if (topic) {
-      filteredEvents = filteredEvents.filter(ue => 
+      filteredEvents = filteredEvents.filter(ue =>
         ue.eventId.topics.includes(topic)
       );
     }
@@ -60,6 +60,19 @@ router.get('/user/:userId', async (req, res) => {
       message: 'Failed to fetch events',
       error: error.message
     });
+  }
+});
+
+// Track event view
+router.patch('/user/:userId/event/:eventId/view', async (req, res) => {
+  try {
+    await UserEvent.findOneAndUpdate(
+      { userId: req.params.userId, eventId: req.params.eventId },
+      { opened: true, clicked: true }
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -129,16 +142,36 @@ router.get('/user/:userId/stats', async (req, res) => {
       sent: true
     });
 
-    const ratedEvents = await UserEvent.countDocuments({
+    const emailsSent = await UserEvent.countDocuments({
       userId: req.params.userId,
-      rating: { $exists: true }
+      sent: true,
+      sentAt: { $exists: true }
     });
+
+    const eventsViewed = await UserEvent.countDocuments({
+      userId: req.params.userId,
+      opened: true
+    });
+
+    const avgRatingResult = await UserEvent.aggregate([
+      { $match: { userId: req.params.userId, rating: { $exists: true, $ne: null } } },
+      {
+        $group: {
+          _id: null,
+          avgRating: { $avg: '$rating' }
+        }
+      }
+    ]);
+
+    const avgRating = avgRatingResult.length > 0 ? avgRatingResult[0].avgRating : null;
 
     res.json({
       success: true,
       stats: {
-        total: totalEvents,
-        rated: ratedEvents,
+        totalEvents,
+        emailsSent,
+        eventsViewed,
+        avgRating,
         byCategory: stats
       }
     });

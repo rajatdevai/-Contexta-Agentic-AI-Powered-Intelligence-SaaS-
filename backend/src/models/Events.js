@@ -4,13 +4,13 @@ const eventSchema = new mongoose.Schema({
   source: {
     type: String,
     enum: ['reddit',
-  'github',
-  'rss',
-  'hackernews',
-  'twitter',        // breaking news, incidents
-  'blog',           // official product blogs
-  'newsletter',     // curated sources
-  'government' ],
+      'github',
+      'rss',
+      'hackernews',
+      'twitter',        // breaking news, incidents
+      'blog',           // official product blogs
+      'newsletter',     // curated sources
+      'government'],
     required: true
   },
   sourceId: String, // Original ID from source
@@ -23,26 +23,29 @@ const eventSchema = new mongoose.Schema({
   category: {
     type: String,
     enum: ['release',
-  'incident',
-  'security',
-  'upgrade',
-  'deprecation',
-  'outage',
-  'vulnerability',
-  'trend',
-  'policy',
-  'regulation',
-  'announcement',
-  'research'
-],
+      'incident',
+      'security',
+      'upgrade',
+      'deprecation',
+      'outage',
+      'vulnerability',
+      'trend',
+      'policy',
+      'regulation',
+      'announcement',
+      'research'
+    ],
     required: true
   },
   topics: [{
     type: String,
-    enum: ['technology', 'politics', 'finance', 'ai', 'cloud', 'sports', 'startups']
+    enum: [
+      'technology', 'politics', 'finance', 'ai', 'cloud', 'sports', 'startups',
+      'cybersecurity', 'web3', 'devops', 'science', 'business', 'geopolitics'
+    ]
   }],
   rawData: mongoose.Schema.Types.Mixed,
-  
+
   // AI Processing
   aiProcessed: {
     type: Boolean,
@@ -56,7 +59,7 @@ const eventSchema = new mongoose.Schema({
     impact: String,
     actionRequired: String
   },
-  
+
   // Review
   needsHumanReview: {
     type: Boolean,
@@ -68,7 +71,7 @@ const eventSchema = new mongoose.Schema({
     enum: ['pending', 'approved', 'rejected', 'edited'],
     default: 'pending'
   },
-  
+
   // Metadata
   publishedAt: Date,
   processedAt: Date
