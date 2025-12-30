@@ -1,8 +1,9 @@
 import { Button } from '../ui/button';
+import { API_URL } from '../../lib/constants';
 
 export function GoogleButton() {
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`;
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   return (
