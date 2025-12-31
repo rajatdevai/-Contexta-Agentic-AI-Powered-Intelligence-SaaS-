@@ -216,7 +216,7 @@ export function OnboardingForm() {
                     onClick={() => setFormData({ ...formData, tone: tone.value })}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`p-4 rounded-lg border-2 transition-all text-left ${
+                    className={`p-4 rounded-lg border-2 transition-all text-left relative z-20 cursor-pointer ${
                       formData.tone === tone.value
                         ? 'border-primary bg-primary/10'
                         : 'border-white/20 hover:border-primary/50 bg-slate-800/50'

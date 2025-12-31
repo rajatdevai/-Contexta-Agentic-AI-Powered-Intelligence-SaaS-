@@ -14,9 +14,9 @@ export function Navbar() {
   const handleUnsubscribe = async () => {
     if (window.confirm('Are you absolutely sure? This will delete your account and all your data forever.')) {
       try {
-        const { usersAPI } = await import('../../api/client');
+        const { eventsAPI } = await import('../../api/client');
         const userId = user?._id || user?.id;
-        await usersAPI.deleteAccount(userId);
+        await eventsAPI.deleteAccount(userId);
         logout();
         navigate('/');
       } catch (error) {

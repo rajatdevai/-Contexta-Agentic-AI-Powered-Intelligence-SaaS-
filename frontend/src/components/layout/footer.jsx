@@ -67,7 +67,7 @@ export function Footer() {
 
         <div className="border-t border-white/10 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-500">&copy; 2024 Contexta AI. All rights reserved.</p>
+            <p className="text-sm text-gray-500">&copy; 2025 Contexta AI. All rights reserved.</p>
             <div className="flex gap-6 text-sm text-gray-500">
               <a href="#terms" className="hover:text-primary transition-colors">Terms</a>
               <a href="#privacy" className="hover:text-primary transition-colors">Privacy</a>

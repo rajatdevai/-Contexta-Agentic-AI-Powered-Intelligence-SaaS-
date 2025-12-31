@@ -1,5 +1,6 @@
 import express from 'express';
 import User from '../models/User.js';
+import UserEvent from '../models/UserEvent.js';
 import crypto from 'crypto';
 
 const router = express.Router();
